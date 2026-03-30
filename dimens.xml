@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_padding_horizontal">16dp</dimen>
+    <dimen name="screen_padding_top">12dp</dimen>
+    <dimen name="screen_padding_bottom">16dp</dimen>
+
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">20dp</dimen>
+
+    <dimen name="spin_button_min_height">96dp</dimen>
+
+    <dimen name="dialog_horizontal_padding">20dp</dimen>
+    <dimen name="dialog_vertical_padding">12dp</dimen>
+</resources>
