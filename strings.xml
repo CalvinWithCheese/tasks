@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tasks Spinner</string>
+
+    <string name="header_add_task">Add Task</string>
+    <string name="header_quick_spin">Quick Spin</string>
+    <string name="header_tasks">Tasks</string>
+
+    <string name="hint_task_name">Task name</string>
+    <string name="hint_duration_minutes">Duration (minutes)</string>
+    <string name="hint_location">Location</string>
+    <string name="hint_duration_required">Duration (required, minutes)</string>
+    <string name="hint_location_optional">Location (optional)</string>
+
+    <string name="button_add_task">Add Task</string>
+    <string name="anywhere_label">Anywhere</string>
+    <string name="specific_location_label">[Specific Location]</string>
+    <string name="button_60_min">60 min</string>
+    <string name="button_30_min">30 min</string>
+    <string name="button_10_min">10 min</string>
+    <string name="button_custom">Custom</string>
+    <string name="button_done">Done</string>
+    <string name="button_quit">Quit</string>
+    <string name="button_completed">Completed</string>
+    <string name="button_not_completed">Not Completed</string>
+
+    <string name="title_choose_location">Choose Location</string>
+    <string name="title_custom_filters">Custom Filters</string>
+
+    <string name="label_cancel">Cancel</string>
+    <string name="label_back">Back</string>
+    <string name="label_spin">Spin</string>
+
+    <string name="selected_task_none">Selected task: none</string>
+    <string name="selected_task_format">Selected task: %1$s (%2$dm @ %3$s)</string>
+    <string name="timer_default">Timer: --:--</string>
+    <string name="timer_format">Timer: %1$02d:%2$02d</string>
+
+    <string name="status_completed">COMPLETED</string>
+    <string name="status_open">OPEN</string>
+    <string name="task_list_item_format">%1$d. %2$s - %3$dm @ %4$s [%5$s]</string>
+    <string name="no_tasks_yet">No tasks yet.</string>
+
+    <string name="msg_missing_fields">Please enter name, duration, and location.</string>
+    <string name="msg_invalid_duration">Duration must be a positive number.</string>
+    <string name="msg_task_added">Task added.</string>
+    <string name="msg_no_locations">No task locations available yet.</string>
+    <string name="msg_choose_completion_first">Please choose Completed / Not Completed first.</string>
+    <string name="msg_timer_running">Timer already running. Press Done or Quit first.</string>
+    <string name="msg_enter_valid_duration">Enter a valid duration.</string>
+    <string name="msg_no_eligible_tasks">No eligible tasks found.</string>
+    <string name="msg_timer_finished">Timer ended. Tap Completed or Not Completed.</string>
+    <string name="msg_no_active_task">No active task.</string>
+    <string name="msg_task_marked_complete">Task marked complete.</string>
+    <string name="msg_timer_quit">Timer quit. Task not completed.</string>
+    <string name="msg_no_task_to_complete">No task to complete.</string>
+    <string name="msg_task_marked_completed">Task marked completed.</string>
+    <string name="msg_task_left_incomplete">Task left incomplete.</string>
+</resources>
