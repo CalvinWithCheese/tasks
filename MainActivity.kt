@@ -1,23 +1,16 @@
-package com.example.tasks // <-- change to your actual package name
+package com.example.tasks
 
 import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputType
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.GridLayout
-import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -35,28 +28,25 @@ class MainActivity : AppCompatActivity() {
     private var timer: CountDownTimer? = null
     private var remainingMillis: Long = 0L
     private var awaitingCompletionDecision = false
+    private var selectedLocation: String? = null // null => anywhere
 
-    private var selectedLocation: String? = null // null => Anywhere
-
-    private lateinit var rootLayout: LinearLayout
-
-    // Add task controls
+    // Add task section
     private lateinit var taskNameInput: EditText
     private lateinit var taskDurationInput: EditText
     private lateinit var taskLocationInput: EditText
     private lateinit var addTaskButton: Button
 
-    // Quick location controls
+    // Location controls
     private lateinit var anywhereButton: Button
     private lateinit var specificLocationButton: Button
 
-    // Quick spin controls
+    // Spin controls
     private lateinit var button60: Button
     private lateinit var button30: Button
     private lateinit var button10: Button
     private lateinit var customButton: Button
 
-    // Status / timer controls
+    // Status / timer
     private lateinit var selectedTaskText: TextView
     private lateinit var timerText: TextView
     private lateinit var doneButton: Button
@@ -64,134 +54,65 @@ class MainActivity : AppCompatActivity() {
     private lateinit var completedButton: Button
     private lateinit var notCompletedButton: Button
 
-    // Task list
+    // Task output
     private lateinit var taskListText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
 
-        rootLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(32, 24, 32, 32)
-        }
+        bindViews()
+        bindListeners()
 
-        val scroll = ScrollView(this).apply {
-            addView(rootLayout)
-        }
-
-        setContentView(scroll)
-
-        ViewCompat.setOnApplyWindowInsetsListener(scroll) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-            insets
-        }
-
-        buildUi()
         refreshTaskList()
         updateLocationButtonStyles()
         setIdleUiState()
     }
 
-    private fun buildUi() {
-        addHeader("Add Task")
-        taskNameInput = addEditText("Task name")
-        taskDurationInput = addEditText("Duration (minutes)", InputType.TYPE_CLASS_NUMBER)
-        taskLocationInput = addEditText("Location")
-        addTaskButton = addButton("Add Task") { addTask() }
+    private fun bindViews() {
+        taskNameInput = findViewById(R.id.etTaskName)
+        taskDurationInput = findViewById(R.id.etTaskDuration)
+        taskLocationInput = findViewById(R.id.etTaskLocation)
+        addTaskButton = findViewById(R.id.btnAddTask)
 
-        addSpacer()
+        anywhereButton = findViewById(R.id.btnAnywhere)
+        specificLocationButton = findViewById(R.id.btnSpecificLocation)
 
-        addHeader("Quick Spin")
+        button60 = findViewById(R.id.btn60)
+        button30 = findViewById(R.id.btn30)
+        button10 = findViewById(R.id.btn10)
+        customButton = findViewById(R.id.btnCustom)
 
-        // Top row: Anywhere | [Specific Location]
-        val locationRow = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            gravity = Gravity.CENTER
-        }
+        selectedTaskText = findViewById(R.id.tvSelectedTask)
+        timerText = findViewById(R.id.tvTimer)
 
-        anywhereButton = Button(this).apply {
-            text = "Anywhere"
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                marginEnd = 12
-            }
-            setOnClickListener {
-                selectedLocation = null
-                updateLocationButtonStyles()
-            }
-        }
+        doneButton = findViewById(R.id.btnDone)
+        quitButton = findViewById(R.id.btnQuit)
+        completedButton = findViewById(R.id.btnCompleted)
+        notCompletedButton = findViewById(R.id.btnNotCompleted)
 
-        specificLocationButton = Button(this).apply {
-            text = "[Specific Location]"
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                marginStart = 12
-            }
-            setOnClickListener { openLocationPicker() }
-        }
-
-        locationRow.addView(anywhereButton)
-        locationRow.addView(specificLocationButton)
-        rootLayout.addView(locationRow)
-
-        addSpacer(16)
-
-        // 2x2 square button grid
-        val grid = GridLayout(this).apply {
-            rowCount = 2
-            columnCount = 2
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        }
-
-        button60 = makeSquareGridButton("60 min") { quickSpin(60) }
-        button30 = makeSquareGridButton("30 min") { quickSpin(30) }
-        button10 = makeSquareGridButton("10 min") { quickSpin(10) }
-        customButton = makeSquareGridButton("Custom") { openCustomSpinDialog() }
-
-        grid.addView(button60)
-        grid.addView(button30)
-        grid.addView(button10)
-        grid.addView(customButton)
-
-        rootLayout.addView(grid)
-
-        addSpacer()
-
-        selectedTaskText = addText("Selected task: none")
-        timerText = addText("Timer: --:--")
-
-        doneButton = addButton("Done") { onDonePressed() }
-        quitButton = addButton("Quit") { onQuitPressed() }
-        completedButton = addButton("Completed") { onCompletedPressed() }
-        notCompletedButton = addButton("Not Completed") { onNotCompletedPressed() }
-
-        addSpacer()
-
-        addHeader("Tasks")
-        taskListText = addText("")
+        taskListText = findViewById(R.id.tvTaskList)
     }
 
-    private fun makeSquareGridButton(label: String, onClick: () -> Unit): Button {
-        return Button(this).apply {
-            text = label
-            minHeight = 220
-            minimumHeight = 220
-            setOnClickListener { onClick() }
-            layoutParams = GridLayout.LayoutParams().apply {
-                width = 0
-                height = GridLayout.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(8, 8, 8, 8)
-            }
+    private fun bindListeners() {
+        addTaskButton.setOnClickListener { addTask() }
+
+        anywhereButton.setOnClickListener {
+            selectedLocation = null
+            updateLocationButtonStyles()
         }
+
+        specificLocationButton.setOnClickListener { openLocationPicker() }
+
+        button60.setOnClickListener { quickSpin(60) }
+        button30.setOnClickListener { quickSpin(30) }
+        button10.setOnClickListener { quickSpin(10) }
+        customButton.setOnClickListener { openCustomSpinDialog() }
+
+        doneButton.setOnClickListener { onDonePressed() }
+        quitButton.setOnClickListener { onQuitPressed() }
+        completedButton.setOnClickListener { onCompletedPressed() }
+        notCompletedButton.setOnClickListener { onNotCompletedPressed() }
     }
 
     private fun addTask() {
@@ -200,13 +121,13 @@ class MainActivity : AppCompatActivity() {
         val location = taskLocationInput.text.toString().trim()
 
         if (name.isEmpty() || durationStr.isEmpty() || location.isEmpty()) {
-            toast("Please enter name, duration, and location.")
+            toast(R.string.msg_missing_fields)
             return
         }
 
         val duration = durationStr.toIntOrNull()
         if (duration == null || duration <= 0) {
-            toast("Duration must be a positive number.")
+            toast(R.string.msg_invalid_duration)
             return
         }
 
@@ -216,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         taskLocationInput.text.clear()
 
         refreshTaskList()
-        toast("Task added.")
+        toast(R.string.msg_task_added)
     }
 
     private fun openLocationPicker() {
@@ -227,69 +148,72 @@ class MainActivity : AppCompatActivity() {
             .sorted()
 
         if (uniqueLocations.isEmpty()) {
-            toast("No task locations available yet.")
+            toast(R.string.msg_no_locations)
             return
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Choose Location")
+            .setTitle(R.string.title_choose_location)
             .setItems(uniqueLocations.toTypedArray()) { dialog, which ->
                 selectedLocation = uniqueLocations[which]
                 updateLocationButtonStyles()
                 dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.label_cancel, null)
             .show()
     }
 
     private fun openCustomSpinDialog() {
         if (awaitingCompletionDecision) {
-            toast("Please choose Completed / Not Completed first.")
+            toast(R.string.msg_choose_completion_first)
             return
         }
 
         if (selectedTask != null && remainingMillis > 0L) {
-            toast("Timer already running. Press Done or Quit first.")
+            toast(R.string.msg_timer_running)
             return
         }
 
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(40, 20, 40, 8)
-        }
-
         val durationInput = EditText(this).apply {
-            hint = "Duration (required, minutes)"
+            hint = getString(R.string.hint_duration_required)
             inputType = InputType.TYPE_CLASS_NUMBER
         }
 
         val locationInput = EditText(this).apply {
-            hint = "Location (optional)"
+            hint = getString(R.string.hint_location_optional)
             setText(selectedLocation ?: "")
         }
 
-        container.addView(durationInput)
-        container.addView(locationInput)
-
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Custom Filters")
-            .setView(container)
-            .setPositiveButton("Spin", null)
-            .setNegativeButton("Back", null)
+            .setTitle(R.string.title_custom_filters)
+            .setView(
+                android.widget.LinearLayout(this).apply {
+                    orientation = android.widget.LinearLayout.VERTICAL
+                    setPadding(
+                        resources.getDimensionPixelSize(R.dimen.dialog_horizontal_padding),
+                        resources.getDimensionPixelSize(R.dimen.dialog_vertical_padding),
+                        resources.getDimensionPixelSize(R.dimen.dialog_horizontal_padding),
+                        resources.getDimensionPixelSize(R.dimen.dialog_vertical_padding)
+                    )
+                    addView(durationInput)
+                    addView(locationInput)
+                }
+            )
+            .setPositiveButton(R.string.label_spin, null)
+            .setNegativeButton(R.string.label_back, null)
             .create()
 
         dialog.setOnShowListener {
-            val spinBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            spinBtn.setOnClickListener {
+            val spinButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            spinButton.setOnClickListener {
                 val duration = durationInput.text.toString().trim().toIntOrNull()
                 if (duration == null || duration <= 0) {
-                    toast("Enter a valid duration.")
+                    toast(R.string.msg_enter_valid_duration)
                     return@setOnClickListener
                 }
 
                 val location = locationInput.text.toString().trim().ifBlank { null }
-                val spun = spinTask(duration, location)
-                if (spun) {
+                if (spinTask(duration, location)) {
                     dialog.dismiss()
                 }
             }
@@ -300,12 +224,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun quickSpin(maxDuration: Int) {
         if (awaitingCompletionDecision) {
-            toast("Please choose Completed / Not Completed first.")
+            toast(R.string.msg_choose_completion_first)
             return
         }
 
         if (selectedTask != null && remainingMillis > 0L) {
-            toast("Timer already running. Press Done or Quit first.")
+            toast(R.string.msg_timer_running)
             return
         }
 
@@ -320,14 +244,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (eligible.isEmpty()) {
-            toast("No eligible tasks found.")
+            toast(R.string.msg_no_eligible_tasks)
             return false
         }
 
         val picked = eligible[Random.nextInt(eligible.size)]
         selectedTask = picked
 
-        selectedTaskText.text = "Selected task: ${picked.name} (${picked.durationMinutes}m @ ${picked.location})"
+        selectedTaskText.text = getString(
+            R.string.selected_task_format,
+            picked.name,
+            picked.durationMinutes,
+            picked.location
+        )
+
         startTimer(picked.durationMinutes)
         setTimerRunningUiState()
         return true
@@ -335,6 +265,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startTimer(durationMinutes: Int) {
         timer?.cancel()
+
         remainingMillis = durationMinutes * 60_000L
         updateTimerText(remainingMillis)
 
@@ -350,14 +281,14 @@ class MainActivity : AppCompatActivity() {
                 updateTimerText(0L)
                 awaitingCompletionDecision = true
                 setAwaitingCompletionUiState()
-                toast("Timer ended. Tap Completed or Not Completed.")
+                toast(R.string.msg_timer_finished)
             }
         }.start()
     }
 
     private fun onDonePressed() {
         val task = selectedTask ?: run {
-            toast("No active task.")
+            toast(R.string.msg_no_active_task)
             return
         }
 
@@ -369,12 +300,12 @@ class MainActivity : AppCompatActivity() {
         selectedTask = null
         awaitingCompletionDecision = false
 
-        selectedTaskText.text = "Selected task: none"
+        selectedTaskText.text = getString(R.string.selected_task_none)
         updateTimerText(0L)
         setIdleUiState()
         refreshTaskList()
 
-        toast("Task marked complete.")
+        toast(R.string.msg_task_marked_complete)
     }
 
     private fun onQuitPressed() {
@@ -384,16 +315,16 @@ class MainActivity : AppCompatActivity() {
         selectedTask = null
         awaitingCompletionDecision = false
 
-        selectedTaskText.text = "Selected task: none"
+        selectedTaskText.text = getString(R.string.selected_task_none)
         updateTimerText(0L)
         setIdleUiState()
 
-        toast("Timer quit. Task not completed.")
+        toast(R.string.msg_timer_quit)
     }
 
     private fun onCompletedPressed() {
         val task = selectedTask ?: run {
-            toast("No task to complete.")
+            toast(R.string.msg_no_task_to_complete)
             return
         }
 
@@ -401,22 +332,22 @@ class MainActivity : AppCompatActivity() {
         selectedTask = null
         awaitingCompletionDecision = false
 
-        selectedTaskText.text = "Selected task: none"
+        selectedTaskText.text = getString(R.string.selected_task_none)
         setIdleUiState()
         refreshTaskList()
 
-        toast("Task marked completed.")
+        toast(R.string.msg_task_marked_completed)
     }
 
     private fun onNotCompletedPressed() {
         selectedTask = null
         awaitingCompletionDecision = false
 
-        selectedTaskText.text = "Selected task: none"
+        selectedTaskText.text = getString(R.string.selected_task_none)
         setIdleUiState()
         refreshTaskList()
 
-        toast("Task left incomplete.")
+        toast(R.string.msg_task_left_incomplete)
     }
 
     private fun setIdleUiState() {
@@ -458,13 +389,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshTaskList() {
         if (tasks.isEmpty()) {
-            taskListText.text = "No tasks yet."
+            taskListText.text = getString(R.string.no_tasks_yet)
             return
         }
 
         taskListText.text = tasks.mapIndexed { index, task ->
-            val status = if (task.isCompleted) "COMPLETED" else "OPEN"
-            "${index + 1}. ${task.name} - ${task.durationMinutes}m @ ${task.location} [$status]"
+            val status = if (task.isCompleted) getString(R.string.status_completed) else getString(R.string.status_open)
+            getString(
+                R.string.task_list_item_format,
+                index + 1,
+                task.name,
+                task.durationMinutes,
+                task.location,
+                status
+            )
         }.joinToString("\n")
     }
 
@@ -472,17 +410,17 @@ class MainActivity : AppCompatActivity() {
         val totalSeconds = ms / 1000
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
-        timerText.text = String.format("Timer: %02d:%02d", minutes, seconds)
+        timerText.text = getString(R.string.timer_format, minutes, seconds)
     }
 
     private fun updateLocationButtonStyles() {
-        val selectedColor = ContextCompat.getColor(this, android.R.color.holo_blue_light)
-        val defaultColor = ContextCompat.getColor(this, android.R.color.darker_gray)
+        val selectedColor = ContextCompat.getColor(this, R.color.location_selected)
+        val defaultColor = ContextCompat.getColor(this, R.color.location_default)
 
         if (selectedLocation == null) {
             anywhereButton.setBackgroundColor(selectedColor)
             specificLocationButton.setBackgroundColor(defaultColor)
-            specificLocationButton.text = "[Specific Location]"
+            specificLocationButton.text = getString(R.string.specific_location_label)
         } else {
             anywhereButton.setBackgroundColor(defaultColor)
             specificLocationButton.setBackgroundColor(selectedColor)
@@ -490,49 +428,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addHeader(text: String): TextView {
-        return TextView(this).also {
-            it.text = text
-            it.textSize = 20f
-            rootLayout.addView(it)
-        }
-    }
-
-    private fun addText(text: String): TextView {
-        return TextView(this).also {
-            it.text = text
-            it.textSize = 16f
-            rootLayout.addView(it)
-        }
-    }
-
-    private fun addEditText(hint: String, inputType: Int = InputType.TYPE_CLASS_TEXT): EditText {
-        return EditText(this).also {
-            it.hint = hint
-            it.inputType = inputType
-            rootLayout.addView(it)
-        }
-    }
-
-    private fun addButton(text: String, onClick: () -> Unit): Button {
-        return Button(this).also {
-            it.text = text
-            it.setOnClickListener { onClick() }
-            rootLayout.addView(it)
-        }
-    }
-
-    private fun addSpacer(heightPx: Int = 24) {
-        val spacer = View(this)
-        spacer.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            heightPx
-        )
-        rootLayout.addView(spacer)
-    }
-
-    private fun toast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+    private fun toast(messageRes: Int) {
+        Toast.makeText(this, getString(messageRes), Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroy() {
