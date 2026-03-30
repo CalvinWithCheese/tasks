@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/screen_padding_horizontal"
+        android:paddingTop="@dimen/screen_padding_top"
+        android:paddingEnd="@dimen/screen_padding_horizontal"
+        android:paddingBottom="@dimen/screen_padding_bottom">
+
+        <TextView
+            android:id="@+id/tvAddTaskHeader"
+            style="@style/SectionHeader"
+            android:text="@string/header_add_task" />
+
+        <EditText
+            android:id="@+id/etTaskName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_task_name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/etTaskDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_duration_minutes"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/etTaskLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_location"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btnAddTask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:text="@string/button_add_task" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_lg" />
+
+        <TextView
+            android:id="@+id/tvQuickSpinHeader"
+            style="@style/SectionHeader"
+            android:text="@string/header_quick_spin" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAnywhere"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/anywhere_label" />
+
+            <Space
+                android:layout_width="@dimen/spacing_md"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/btnSpecificLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/specific_location_label" />
+        </LinearLayout>
+
+        <GridLayout
+            android:id="@+id/gridQuickSpin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <Button
+                android:id="@+id/btn60"
+                style="@style/SpinButton"
+                android:text="@string/button_60_min" />
+
+            <Button
+                android:id="@+id/btn30"
+                style="@style/SpinButton"
+                android:text="@string/button_30_min" />
+
+            <Button
+                android:id="@+id/btn10"
+                style="@style/SpinButton"
+                android:text="@string/button_10_min" />
+
+            <Button
+                android:id="@+id/btnCustom"
+                style="@style/SpinButton"
+                android:text="@string/button_custom" />
+        </GridLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_lg" />
+
+        <TextView
+            android:id="@+id/tvSelectedTask"
+            style="@style/BodyText"
+            android:text="@string/selected_task_none" />
+
+        <TextView
+            android:id="@+id/tvTimer"
+            style="@style/BodyText"
+            android:text="@string/timer_default" />
+
+        <Button
+            android:id="@+id/btnDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/button_done"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnQuit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/button_quit"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/button_completed"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnNotCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="@string/button_not_completed"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spacing_lg" />
+
+        <TextView
+            android:id="@+id/tvTasksHeader"
+            style="@style/SectionHeader"
+            android:text="@string/header_tasks" />
+
+        <TextView
+            android:id="@+id/tvTaskList"
+            style="@style/BodyText"
+            android:text="@string/no_tasks_yet" />
+
+    </LinearLayout>
+</ScrollView>
